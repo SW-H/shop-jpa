@@ -1,9 +1,12 @@
 package com.seungwon.shop.domain.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.seungwon.shop.domain.Delivery;
+import com.seungwon.shop.domain.DeliveryStatus;
 import com.seungwon.shop.domain.Member;
 import com.seungwon.shop.domain.Order;
 import com.seungwon.shop.domain.OrderItem;
@@ -11,6 +14,7 @@ import com.seungwon.shop.domain.item.Item;
 import com.seungwon.shop.domain.repository.ItemRepository;
 import com.seungwon.shop.domain.repository.MemberRepository;
 import com.seungwon.shop.domain.repository.OrderRepository;
+import com.seungwon.shop.domain.repository.OrderSearch;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +30,7 @@ public class OrderService {
 	/*
 	 * 주문
 	 * */
+	@Transactional
 	public Long order(Long memberId, Long itemId, int count) {
 		//엔티티 조회
 		Member member = memberRepository.findOne(memberId);
@@ -34,6 +39,7 @@ public class OrderService {
 		//배송정보 생성
 		Delivery delivery = new Delivery();
 		delivery.setAddress(member.getAddress());
+		delivery.setStatus(DeliveryStatus.READY);
 
 		//주문상품 생성
 		OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), count);
@@ -54,7 +60,8 @@ public class OrderService {
 	}
 
 	// 검색
-	// public List<Order> findOrders(OrderSearch orderSearch){
-	//
-	// }
+	public List<Order> findOrders(OrderSearch orderSearch) {
+		return orderRepository.findAllByCriteria(orderSearch);
+
+	}
 }
